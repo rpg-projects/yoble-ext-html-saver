@@ -1,13 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Personagem Extension",
+  "name": "HTML Save Extension",
   "version": "1.0",
-  "permissions": ["storage", "activeTab", "scripting"],
+  "description": "Uma extensão que adiciona um botão para adicionar HTML e gerenciar personagens.",
+  "permissions": ["storage", "activeTab"],
   "action": {
     "default_popup": "popup.html"
-  },
-  "background": {
-    "service_worker": "background.js"
   },
   "content_scripts": [
     {
@@ -17,7 +15,8 @@
         "https://yoble.com.br/Main/communities/*/topic/*",
         "https://yoble.com.br./Main/communities/*/topic/*"
       ],
-      "js": ["content.js"]
+      "js": ["content.js"],
+      "run_at": "document_end"
     }
   ]
 }

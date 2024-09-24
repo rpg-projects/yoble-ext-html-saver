@@ -1,157 +1,199 @@
-chrome.cookies.get(
-  { url: window.location.hostname, name: "characterData" },
-  function (cookie) {
-    if (cookie) {
-      const characters = JSON.parse(cookie.value);
-      console.log("Dados recuperados dos cookies:", characters);
-
-      // Você pode iterar sobre os personagens e usar os dados conforme necessário
-      characters.forEach((char) => {
-        console.log(
-          `Nome: ${char.charName}, HTML: ${char.html}, Fala: ${char.fala}`
-        );
-      });
-    } else {
-      console.log("Nenhum cookie encontrado.");
-    }
-  }
-);
-
-// Selecionar o contêiner que contém o botão "Responder"
+// Adiciona o botão "Adicionar HTML" ao container
 const buttonContainer = document.querySelector(".col-md-12");
+const submitButton = buttonContainer.querySelector(".btn-success");
 
-// Verificar se o contêiner existe
 if (buttonContainer) {
-  //Espaço abaixo dos botões
   buttonContainer.style.marginBottom = "40px";
 
-  // Criar o botão "Adicionar HTML"
   const addButton = document.createElement("button");
   addButton.innerText = "Adicionar HTML";
   addButton.classList.add("btn", "btn-default", "btn-primary");
   addButton.style.marginLeft = "5px"; // Espaçamento
-  addButton.onclick = openPopup;
 
-  // Inserir o botão "Adicionar HTML" ao lado do botão "Responder"
-  const submitButton = buttonContainer.querySelector(".btn-success");
-  if (submitButton) {
-    submitButton.insertAdjacentElement("afterend", addButton);
+  // Impede a ação do botão de sucesso
+  addButton.onclick = function (event) {
+    event.preventDefault(); // Impede o comportamento padrão
+    event.stopPropagation(); // Para evitar que o clique propague para o botão de submit
+    openFakePopup(); // Ao clicar, abre o popup
+  };
+
+  // Adiciona o botão após o botão de submit
+  submitButton.insertAdjacentElement("afterend", addButton);
+
+  // Verifica se há personagens e cria o botão "Menu de Chars"
+  if (getCharacters().length > 0) {
+    createMenuButton();
+  }
+}
+
+// Função para abrir o fake popup
+function openFakePopup(charData = {}) {
+  // Cria o elemento do popup
+  const popupContainer = document.createElement("div");
+  popupContainer.id = "popupContainer";
+  popupContainer.style.position = "fixed";
+  popupContainer.style.top = "50%";
+  popupContainer.style.left = "50%";
+  popupContainer.style.transform = "translate(-50%, -50%)";
+  popupContainer.style.zIndex = "1000";
+  popupContainer.style.backgroundColor = "#fff";
+  popupContainer.style.padding = "20px";
+  popupContainer.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.5)";
+
+  // HTML do popup
+  const popupHTML = `
+    <div>
+      <h3>Adicionar Personagem</h3>
+      <form id="charForm">
+        <div>
+          <label for="charName">Nome do personagem:</label>
+          <input type="text" id="charName" placeholder="personagem" required />
+        </div>
+        <div>
+          <label for="charHtml">HTML da narração:</label>
+          <input type="text" id="charHtml" placeholder="<html>TEXTO</html>" required />
+          <button type="button" title="coloque o html e destaque com a palavra 'TEXTO' onde você quer o texto do personagem">?</button>
+        </div>
+        <div>
+          <label for="charSpeech">HTML da fala:</label>
+          <input type="text" id="charSpeech" placeholder="<b>— FALA —</b>" required />
+          <button type="button" title="coloque o html e destaque com a palavra 'FALA' onde você quer o texto do personagem">?</button>
+        </div>
+        <button type="button" id="saveChar">Salvar</button>
+        <button type="button" id="closePopup">Fechar</button>
+      </form>
+    </div>
+  `;
+
+  // Adiciona o HTML ao popup
+  popupContainer.innerHTML = popupHTML;
+  document.body.appendChild(popupContainer);
+
+  // Preenche os campos se for uma edição
+  if (charData.charName) {
+    document.getElementById("charName").value = charData.charName;
+    document.getElementById("charHtml").value = charData.html;
+    document.getElementById("charSpeech").value = charData.fala;
   }
 
-  // Função para verificar se há personagens no localStorage
-  function hasCharacters() {
-    const characters = JSON.parse(localStorage.getItem("characters")) || [];
+  // Event Listeners
+  document.getElementById("saveChar").onclick = saveCharacter;
+  document.getElementById("closePopup").onclick = () => {
+    document.body.removeChild(popupContainer);
+  };
+}
 
-    return characters.length > 0;
+// Função para salvar o personagem
+function saveCharacter() {
+  const charName = document.getElementById("charName").value.trim();
+  const charHtml = document.getElementById("charHtml").value.trim();
+  const charSpeech = document.getElementById("charSpeech").value.trim();
+
+  // Verificações
+  if (!charName) {
+    alert("Nome do personagem é obrigatório!");
+    return;
+  }
+  //   if (!charHtml.includes("TEXTO")) {
+  //     alert("HTML da narração deve conter 'TEXTO' e começar com '<html>'!");
+  //     return;
+  //   }
+  //   if (!charSpeech.includes("FALA")) {
+  //     alert("HTML da fala deve conter 'FALA'!");
+  //     return;
+  //   }
+
+  // Salvar no localStorage
+  const characters = getCharacters();
+  const existingCharIndex = characters.findIndex(
+    (c) => c.charName === charName
+  );
+
+  const charData = { charName, html: charHtml, fala: charSpeech };
+
+  if (existingCharIndex > -1) {
+    characters[existingCharIndex] = charData; // Atualiza se já existir
+  } else {
+    characters.push(charData); // Adiciona novo personagem
   }
 
-  // Verificar se há personagens e, se houver, criar o botão "Menu de Personagens"
-  if (hasCharacters()) {
-    // Criar o botão "Menu de Personagens"
-    const menuButton = document.createElement("button");
-    menuButton.innerText = "Menu de Personagens";
-    menuButton.classList.add("btn", "btn-default", "btn-info");
-    menuButton.style.marginLeft = "5px"; // Espaçamento entre os botões
-    menuButton.onclick = toggleCharacterMenu;
+  localStorage.setItem("characters", JSON.stringify(characters));
+  alert("Personagem salvo com sucesso!");
 
-    // Inserir o botão "Menu de Personagens" ao lado do botão "Adicionar HTML"
-    addButton.insertAdjacentElement("afterend", menuButton);
+  // Atualiza o menu de chars se necessário
+  if (characters.length === 1) {
+    createMenuButton();
+  }
 
-    // Criar o menu de personagens (inicialmente oculto)
-    const charMenu = document.createElement("div");
-    charMenu.classList.add("character-menu");
-    charMenu.style.display = "none"; // Esconder o menu inicialmente
-    charMenu.style.marginTop = "10px";
+  // Fecha o popup
+  document.getElementById("popupContainer").remove();
+}
+
+// Função para criar o botão "Menu de Chars"
+function createMenuButton() {
+  const menuButton = document.createElement("button");
+  menuButton.innerText = "Menu de Chars";
+  menuButton.classList.add("btn", "btn-default", "btn-info");
+  menuButton.style.marginLeft = "5px"; // Espaçamento
+  menuButton.onclick = toggleCharacterMenu;
+
+  const toolbar = document.querySelector(".note-toolbar.panel-heading");
+  toolbar.appendChild(menuButton);
+}
+
+// Função para alternar o menu de personagens
+function toggleCharacterMenu() {
+  let charMenu = document.getElementById("charMenu");
+
+  if (!charMenu) {
+    charMenu = document.createElement("div");
+    charMenu.id = "charMenu";
+    charMenu.style.position = "absolute";
+    charMenu.style.backgroundColor = "#f9f9f9";
     charMenu.style.border = "1px solid #ccc";
     charMenu.style.padding = "10px";
-    charMenu.style.backgroundColor = "#f9f9f9";
+    charMenu.style.zIndex = "1000";
 
-    // Adicionar o menu ao contêiner de botões
-    buttonContainer.appendChild(charMenu);
+    const characters = getCharacters();
+    characters.forEach((char) => {
+      const charItem = document.createElement("div");
+      charItem.innerText = char.charName;
+      charItem.style.marginBottom = "5px";
 
-    // Função para popular o menu de personagens
-    function populateCharacterMenu() {
-      charMenu.innerHTML = ""; // Limpar o menu
-      const characters = JSON.parse(localStorage.getItem("characters")) || [];
+      const editButton = document.createElement("button");
+      editButton.innerText = "Editar";
+      editButton.onclick = () => {
+        openFakePopup(char);
+        document.body.removeChild(charMenu); // Fecha o menu
+      };
 
-      if (characters.length === 0) {
-        const emptyMessage = document.createElement("p");
-        emptyMessage.innerText = "Nenhum personagem adicionado.";
-        charMenu.appendChild(emptyMessage);
-      } else {
-        characters.forEach((char) => {
-          const charItem = document.createElement("div");
-          charItem.style.marginBottom = "10px";
+      const deleteButton = document.createElement("button");
+      deleteButton.innerText = "Deletar";
+      deleteButton.onclick = () => {
+        deleteCharacter(char.charName);
+        document.body.removeChild(charMenu); // Fecha o menu
+      };
 
-          const charName = document.createElement("span");
-          charName.innerText = char.char;
+      charItem.appendChild(editButton);
+      charItem.appendChild(deleteButton);
+      charMenu.appendChild(charItem);
+    });
 
-          const editIcon = document.createElement("button");
-          editIcon.innerText = "✏️";
-          editIcon.style.marginLeft = "10px";
-          editIcon.onclick = () => editCharacter(char.char);
-
-          const deleteIcon = document.createElement("button");
-          deleteIcon.innerText = "🗑️";
-          deleteIcon.style.marginLeft = "5px";
-          deleteIcon.onclick = () => deleteCharacter(char.char);
-
-          charItem.appendChild(charName);
-          charItem.appendChild(editIcon);
-          charItem.appendChild(deleteIcon);
-
-          charMenu.appendChild(charItem);
-        });
-      }
-    }
-
-    // Função para alternar o menu de personagens
-    function toggleCharacterMenu() {
-      if (charMenu.style.display === "none") {
-        populateCharacterMenu();
-        charMenu.style.display = "block";
-      } else {
-        charMenu.style.display = "none";
-      }
-    }
-
-    // Função para editar um personagem
-    function editCharacter(charName) {
-      const characters = JSON.parse(localStorage.getItem("characters")) || [];
-      const char = characters.find((c) => c.char === charName);
-      if (char) {
-        document.getElementById("charName").value = char.charName;
-        document.getElementById("charHtml").value = char.html;
-        document.getElementById("charSpeech").value = char.fala;
-      }
-      openPopup(); // Abrir o popup de edição
-    }
-
-    // Função para deletar um personagem
-    function deleteCharacter(charName) {
-      let characters = JSON.parse(localStorage.getItem("characters")) || [];
-      characters = characters.filter((c) => c.char !== charName);
-      localStorage.setItem("characters", JSON.stringify(characters));
-      alert("Personagem removido.");
-      populateCharacterMenu(); // Atualizar o menu
-    }
+    document.body.appendChild(charMenu);
+  } else {
+    document.body.removeChild(charMenu); // Fecha o menu se já estiver aberto
   }
 }
 
-// Função para abrir o popup da extensão
-function openPopup() {
-  chrome.runtime.sendMessage({ action: "openPopup" });
+// Função para deletar um personagem
+function deleteCharacter(charName) {
+  let characters = getCharacters();
+  characters = characters.filter((c) => c.charName !== charName);
+  localStorage.setItem("characters", JSON.stringify(characters));
+  alert("Personagem deletado.");
 }
 
-// Salvar o conteúdo da área de texto (narrativa) automaticamente
-const textBox = document.querySelector(".note-editable.panel-body");
-if (textBox) {
-  textBox.addEventListener("input", function () {
-    localStorage.setItem("userText", textBox.innerHTML);
-  });
-  // Restaurar o texto salvo se o usuário recarregar a página
-  const savedText = localStorage.getItem("userText");
-  if (savedText) {
-    textBox.innerHTML = savedText;
-  }
+// Função para obter personagens do localStorage
+function getCharacters() {
+  return JSON.parse(localStorage.getItem("characters")) || [];
 }
