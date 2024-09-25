@@ -1,3 +1,9 @@
+const fontAwesome = document.createElement("link");
+fontAwesome.rel = "stylesheet";
+fontAwesome.href =
+  "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css";
+document.head.appendChild(fontAwesome);
+
 // Adiciona o botão "Adicionar HTML" ao container
 const buttonContainer = document.querySelector(".col-md-12").children[3];
 const backButton = buttonContainer.querySelector(".btn-info");
@@ -27,7 +33,7 @@ if (buttonContainer) {
 
   // Verifica se há personagens e cria o botão "Menu de Chars"
   if (getCharacters().length > 0) {
-    addButton.style.marginLeft = "28%";
+    addButton.style.marginLeft = "38%";
     createMenuButton();
   }
 }
@@ -35,23 +41,6 @@ if (buttonContainer) {
 // Função para obter personagens do localStorage
 function getCharacters() {
   return JSON.parse(localStorage.getItem("characters")) || [];
-}
-
-// Função para criar o botão "Menu de Chars"
-function createMenuButton() {
-  const menuButton = document.createElement("button");
-  menuButton.innerText = "Menu de Chars";
-  menuButton.classList.add("btn", "btn-default", "btn-secondary");
-  menuButton.style.marginLeft = "5px";
-
-  // Impede a ação do botão de sucesso
-  menuButton.onclick = function (event) {
-    event.preventDefault(); // Impede o comportamento padrão
-    event.stopPropagation(); // Para evitar que o clique propague para o botão de submit
-    toggleCharacterMenu(); // Ao clicar, abre o popup
-  };
-
-  addButton.insertAdjacentElement("afterend", menuButton);
 }
 
 // Função para abrir o fake popup
@@ -150,7 +139,7 @@ function saveCharacter() {
 
   // Atualiza o menu de chars se necessário
   if (characters.length === 1) {
-    addButton.style.marginLeft = "28%";
+    addButton.style.marginLeft = "38%";
     createMenuButton();
   }
 
@@ -159,47 +148,249 @@ function saveCharacter() {
 }
 
 // Função para alternar o menu de personagens
-function toggleCharacterMenu() {
-  let charMenu = document.getElementById("charMenu");
+// function toggleCharacterMenu() {
+//   let charMenu = document.getElementById("charMenu");
 
-  if (!charMenu) {
-    charMenu = document.createElement("div");
-    charMenu.id = "charMenu";
-    charMenu.style.position = "absolute";
-    charMenu.style.backgroundColor = "#f9f9f9";
-    charMenu.style.border = "1px solid #ccc";
-    charMenu.style.padding = "10px";
-    charMenu.style.zIndex = "1000";
+//   if (!charMenu) {
+//     charMenu = document.createElement("div");
+//     charMenu.id = "charMenu";
+//     charMenu.style.position = "absolute";
+//     charMenu.style.backgroundColor = "#f9f9f9";
+//     charMenu.style.border = "1px solid #ccc";
+//     charMenu.style.padding = "10px";
+//     charMenu.style.zIndex = "1000";
 
-    const characters = getCharacters();
-    characters.forEach((char) => {
-      const charItem = document.createElement("div");
-      charItem.innerText = char.charName;
-      charItem.style.marginBottom = "5px";
+//     const characters = getCharacters();
+//     characters.forEach((char) => {
+//       const charItem = document.createElement("div");
+//       charItem.innerText = char.charName;
+//       charItem.style.marginBottom = "5px";
 
-      const editButton = document.createElement("button");
-      editButton.innerText = "Editar";
-      editButton.onclick = () => {
-        openFakePopup(char);
-        document.body.removeChild(charMenu); // Fecha o menu
-      };
+//       const editButton = document.createElement("button");
+//       editButton.innerText = "Editar";
+//       editButton.onclick = () => {
+//         openFakePopup(char);
+//         document.body.removeChild(charMenu); // Fecha o menu
+//       };
 
-      const deleteButton = document.createElement("button");
-      deleteButton.innerText = "Deletar";
-      deleteButton.onclick = () => {
-        deleteCharacter(char.charName);
-        document.body.removeChild(charMenu); // Fecha o menu
-      };
+//       const deleteButton = document.createElement("button");
+//       deleteButton.innerText = "Deletar";
+//       deleteButton.onclick = () => {
+//         deleteCharacter(char.charName);
+//         document.body.removeChild(charMenu); // Fecha o menu
+//       };
 
-      charItem.appendChild(editButton);
-      charItem.appendChild(deleteButton);
-      charMenu.appendChild(charItem);
-    });
+//       charItem.appendChild(editButton);
+//       charItem.appendChild(deleteButton);
+//       charMenu.appendChild(charItem);
+//     });
 
-    document.body.appendChild(charMenu);
-  } else {
-    document.body.removeChild(charMenu); // Fecha o menu se já estiver aberto
-  }
+//     document.body.appendChild(charMenu);
+//   } else {
+//     document.body.removeChild(charMenu); // Fecha o menu se já estiver aberto
+//   }
+// }
+
+// Função para deletar um personagem
+// function deleteCharacter(charName) {
+//   let characters = getCharacters();
+//   characters = characters.filter((c) => c.charName !== charName);
+//   localStorage.setItem("characters", JSON.stringify(characters));
+//   alert("Personagem deletado.");
+// }
+
+// Função para criar o botão "Menu de Chars"
+// function createMenuButton() {
+//   // Create the container for the dropdown
+//   const dropdownContainer = document.createElement("div");
+//   dropdownContainer.classList.add("dropdown");
+
+//   const menuButton = document.createElement("button");
+//   menuButton.innerText = "Menu de Chars";
+//   menuButton.classList.add(
+//     "btn",
+//     "btn-default",
+//     "btn-secondary",
+//     "dropdown-toggle"
+//   );
+//   menuButton.setAttribute("data-toggle", "dropdown");
+//   menuButton.setAttribute("aria-expanded", "false");
+//   menuButton.style.marginLeft = "5px";
+
+//   const dropdownMenu = document.createElement("ul");
+//   dropdownMenu.classList.add("dropdown-menu");
+//   dropdownMenu.style.padding = "10px";
+//   dropdownMenu.style.width = "200px";
+
+//   // Impede a ação do botão de sucesso
+//   menuButton.onclick = function (event) {
+//     event.preventDefault(); // Impede o comportamento padrão
+//     event.stopPropagation(); // Para evitar que o clique propague para o botão de submit
+//     toggleCharacterMenu(); // Ao clicar, abre o popup
+//   };
+
+//   addButton.insertAdjacentElement("afterend", menuButton);
+
+//   // Preenche o menu dropdown com personagens salvos
+//   //   const characters = getCharacters();
+//   //   characters.forEach((char) => {
+//   //     const charItem = document.createElement("li");
+//   //     charItem.style.marginBottom = "5px";
+
+//   //     const charLink = document.createElement("a");
+//   //     charLink.href = "#";
+//   //     charLink.innerText = char.charName;
+//   //     charLink.style.display = "block";
+
+//   //     // Botão de editar personagem
+//   //     const editButton = document.createElement("button");
+//   //     editButton.innerText = "Editar";
+//   //     editButton.classList.add("btn", "btn-warning", "btn-sm");
+//   //     editButton.style.marginRight = "5px";
+//   //     editButton.onclick = () => {
+//   //       openFakePopup(char); // Abre o popup de edição
+//   //     };
+
+//   //     // Botão de deletar personagem
+//   //     const deleteButton = document.createElement("button");
+//   //     deleteButton.innerText = "Deletar";
+//   //     deleteButton.classList.add("btn", "btn-danger", "btn-sm");
+//   //     deleteButton.onclick = () => {
+//   //       deleteCharacter(char.charName); // Deleta o personagem
+//   //       loadCharacterDropdown(dropdownMenu); // Atualiza o dropdown
+//   //     };
+
+//   //     // Adiciona o link e os botões no item do menu
+//   //     charItem.appendChild(charLink);
+//   //     charItem.appendChild(editButton);
+//   //     charItem.appendChild(deleteButton);
+//   //     dropdownMenu.appendChild(charItem);
+//   //   });
+
+//   dropdownContainer.appendChild(menuButton);
+//   dropdownContainer.appendChild(dropdownMenu);
+
+//   // Adiciona o botão após o botão de adicionar
+//   addButton.insertAdjacentElement("afterend", dropdownContainer);
+// }
+
+function createMenuButton() {
+  // Create the container for the dropdown
+  const dropdownContainer = document.createElement("div");
+  dropdownContainer.id = "dropdown-container-chars";
+  dropdownContainer.classList.add("dropdown");
+
+  // Create the menu button
+  const menuButton = document.createElement("button");
+  menuButton.innerHTML = `<i class="fa fa-bars"></i> <span class="caret"></span>`;
+  menuButton.classList.add(
+    "btn",
+    "btn-default",
+    "btn-secondary",
+    "dropdown-toggle"
+  );
+  menuButton.setAttribute("data-toggle", "dropdown");
+  menuButton.setAttribute("aria-expanded", "false");
+  menuButton.style.marginLeft = "5px";
+
+  // Create the dropdown menu
+  const dropdownMenu = document.createElement("ul");
+  dropdownMenu.classList.add("dropdown-menu");
+  dropdownMenu.style.padding = "10px";
+  dropdownMenu.style.width = "200px";
+
+  dropdownMenu.style.marginTop = "-180%";
+  dropdownMenu.style.marginLeft = "-250%";
+
+  // Add the button and menu to the dropdown container
+  dropdownContainer.appendChild(menuButton);
+  dropdownContainer.appendChild(dropdownMenu);
+
+  // Add the dropdown after the "Adicionar HTML" button
+  addButton.insertAdjacentElement("afterend", dropdownContainer);
+
+  // Populate the dropdown with saved characters (if needed)
+  const characters = getCharacters(); // Assuming getCharacters() is already defined
+  characters.forEach((char) => {
+    const charItem = document.createElement("li");
+    charItem.style.display = "flex";
+    charItem.style.marginBottom = "5px";
+
+    const charLink = document.createElement("a");
+    charLink.href = "#";
+    charLink.innerText = char.charName;
+    charLink.style.display = "block";
+
+    // Edit button for the character
+    const editButton = document.createElement("button");
+    editButton.innerHTML = `<i class="fa fa-pen"></i> <span class="caret"></span>`;
+    editButton.classList.add("btn", "btn-warning", "btn-sm");
+    editButton.style.marginRight = "5px";
+    editButton.onclick = (event) => {
+      event.preventDefault(); // Impede o comportamento padrão
+      event.stopPropagation(); // Para evitar que o clique propague para o botão de submit
+      openFakePopup(char); // Assuming openFakePopup(char) is defined
+    };
+
+    // Delete button for the character
+    const deleteButton = document.createElement("button");
+    deleteButton.innerHTML = `<i class="fa fa-trash"></i> <span class="caret"></span>`;
+    deleteButton.classList.add("btn", "btn-danger", "btn-sm");
+    deleteButton.onclick = (event) => {
+      event.preventDefault(); // Impede o comportamento padrão
+      event.stopPropagation(); // Para evitar que o clique propague para o botão de submit
+      deleteCharacter(char.charName); // Assuming deleteCharacter(charName) is defined
+      loadCharacterDropdown(dropdownMenu); // Assuming loadCharacterDropdown(dropdownMenu) is defined to refresh the menu
+    };
+
+    // Append the link and buttons to the list item
+    charItem.appendChild(charLink);
+    charItem.appendChild(editButton);
+    charItem.appendChild(deleteButton);
+
+    // Add the list item to the dropdown menu
+    dropdownMenu.appendChild(charItem);
+  });
+}
+
+// Função para carregar personagens no dropdown (caso seja atualizado)
+function loadCharacterDropdown(dropdownMenu) {
+  dropdownMenu.innerHTML = ""; // Limpa a lista antes de adicionar os personagens
+
+  const characters = getCharacters();
+  characters.forEach((char) => {
+    const charItem = document.createElement("li");
+    charItem.style.marginBottom = "5px";
+
+    const charLink = document.createElement("a");
+    charLink.href = "#";
+    charLink.innerText = char.charName;
+    charLink.style.display = "block";
+
+    // Botão de editar personagem
+    const editButton = document.createElement("button");
+    editButton.innerText = "Editar";
+    editButton.classList.add("btn", "btn-warning", "btn-sm");
+    editButton.style.marginRight = "5px";
+    editButton.onclick = () => {
+      openFakePopup(char); // Abre o popup de edição
+    };
+
+    // Botão de deletar personagem
+    const deleteButton = document.createElement("button");
+    deleteButton.innerText = "Deletar";
+    deleteButton.classList.add("btn", "btn-danger", "btn-sm");
+    deleteButton.onclick = () => {
+      deleteCharacter(char.charName); // Deleta o personagem
+      loadCharacterDropdown(dropdownMenu); // Recarrega a lista de personagens
+    };
+
+    // Adiciona o link e os botões no item do menu
+    charItem.appendChild(charLink);
+    charItem.appendChild(editButton);
+    charItem.appendChild(deleteButton);
+    dropdownMenu.appendChild(charItem);
+  });
 }
 
 // Função para deletar um personagem
@@ -208,4 +399,8 @@ function deleteCharacter(charName) {
   characters = characters.filter((c) => c.charName !== charName);
   localStorage.setItem("characters", JSON.stringify(characters));
   alert("Personagem deletado.");
+
+  const dropdownContainer = document.getElementById("dropdown-container-chars");
+  dropdownContainer.innerHTML = "";
+  addButton.style.marginLeft = "45%";
 }
