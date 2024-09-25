@@ -1,8 +1,8 @@
-const fontAwesome = document.createElement("link");
-fontAwesome.rel = "stylesheet";
-fontAwesome.href =
-  "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css";
-document.head.appendChild(fontAwesome);
+// const fontAwesome = document.createElement("link");
+// fontAwesome.rel = "stylesheet";
+// fontAwesome.href =
+//   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css";
+// document.head.appendChild(fontAwesome);
 
 // Adiciona o botão "Adicionar HTML" ao container
 const buttonContainer = document.querySelector(".col-md-12").children[3];
@@ -147,133 +147,6 @@ function saveCharacter() {
   document.getElementById("popupContainer").remove();
 }
 
-// Função para alternar o menu de personagens
-// function toggleCharacterMenu() {
-//   let charMenu = document.getElementById("charMenu");
-
-//   if (!charMenu) {
-//     charMenu = document.createElement("div");
-//     charMenu.id = "charMenu";
-//     charMenu.style.position = "absolute";
-//     charMenu.style.backgroundColor = "#f9f9f9";
-//     charMenu.style.border = "1px solid #ccc";
-//     charMenu.style.padding = "10px";
-//     charMenu.style.zIndex = "1000";
-
-//     const characters = getCharacters();
-//     characters.forEach((char) => {
-//       const charItem = document.createElement("div");
-//       charItem.innerText = char.charName;
-//       charItem.style.marginBottom = "5px";
-
-//       const editButton = document.createElement("button");
-//       editButton.innerText = "Editar";
-//       editButton.onclick = () => {
-//         openFakePopup(char);
-//         document.body.removeChild(charMenu); // Fecha o menu
-//       };
-
-//       const deleteButton = document.createElement("button");
-//       deleteButton.innerText = "Deletar";
-//       deleteButton.onclick = () => {
-//         deleteCharacter(char.charName);
-//         document.body.removeChild(charMenu); // Fecha o menu
-//       };
-
-//       charItem.appendChild(editButton);
-//       charItem.appendChild(deleteButton);
-//       charMenu.appendChild(charItem);
-//     });
-
-//     document.body.appendChild(charMenu);
-//   } else {
-//     document.body.removeChild(charMenu); // Fecha o menu se já estiver aberto
-//   }
-// }
-
-// Função para deletar um personagem
-// function deleteCharacter(charName) {
-//   let characters = getCharacters();
-//   characters = characters.filter((c) => c.charName !== charName);
-//   localStorage.setItem("characters", JSON.stringify(characters));
-//   alert("Personagem deletado.");
-// }
-
-// Função para criar o botão "Menu de Chars"
-// function createMenuButton() {
-//   // Create the container for the dropdown
-//   const dropdownContainer = document.createElement("div");
-//   dropdownContainer.classList.add("dropdown");
-
-//   const menuButton = document.createElement("button");
-//   menuButton.innerText = "Menu de Chars";
-//   menuButton.classList.add(
-//     "btn",
-//     "btn-default",
-//     "btn-secondary",
-//     "dropdown-toggle"
-//   );
-//   menuButton.setAttribute("data-toggle", "dropdown");
-//   menuButton.setAttribute("aria-expanded", "false");
-//   menuButton.style.marginLeft = "5px";
-
-//   const dropdownMenu = document.createElement("ul");
-//   dropdownMenu.classList.add("dropdown-menu");
-//   dropdownMenu.style.padding = "10px";
-//   dropdownMenu.style.width = "200px";
-
-//   // Impede a ação do botão de sucesso
-//   menuButton.onclick = function (event) {
-//     event.preventDefault(); // Impede o comportamento padrão
-//     event.stopPropagation(); // Para evitar que o clique propague para o botão de submit
-//     toggleCharacterMenu(); // Ao clicar, abre o popup
-//   };
-
-//   addButton.insertAdjacentElement("afterend", menuButton);
-
-//   // Preenche o menu dropdown com personagens salvos
-//   //   const characters = getCharacters();
-//   //   characters.forEach((char) => {
-//   //     const charItem = document.createElement("li");
-//   //     charItem.style.marginBottom = "5px";
-
-//   //     const charLink = document.createElement("a");
-//   //     charLink.href = "#";
-//   //     charLink.innerText = char.charName;
-//   //     charLink.style.display = "block";
-
-//   //     // Botão de editar personagem
-//   //     const editButton = document.createElement("button");
-//   //     editButton.innerText = "Editar";
-//   //     editButton.classList.add("btn", "btn-warning", "btn-sm");
-//   //     editButton.style.marginRight = "5px";
-//   //     editButton.onclick = () => {
-//   //       openFakePopup(char); // Abre o popup de edição
-//   //     };
-
-//   //     // Botão de deletar personagem
-//   //     const deleteButton = document.createElement("button");
-//   //     deleteButton.innerText = "Deletar";
-//   //     deleteButton.classList.add("btn", "btn-danger", "btn-sm");
-//   //     deleteButton.onclick = () => {
-//   //       deleteCharacter(char.charName); // Deleta o personagem
-//   //       loadCharacterDropdown(dropdownMenu); // Atualiza o dropdown
-//   //     };
-
-//   //     // Adiciona o link e os botões no item do menu
-//   //     charItem.appendChild(charLink);
-//   //     charItem.appendChild(editButton);
-//   //     charItem.appendChild(deleteButton);
-//   //     dropdownMenu.appendChild(charItem);
-//   //   });
-
-//   dropdownContainer.appendChild(menuButton);
-//   dropdownContainer.appendChild(dropdownMenu);
-
-//   // Adiciona o botão após o botão de adicionar
-//   addButton.insertAdjacentElement("afterend", dropdownContainer);
-// }
-
 function createMenuButton() {
   // Create the container for the dropdown
   const dropdownContainer = document.createElement("div");
@@ -323,7 +196,7 @@ function createMenuButton() {
 
     // Edit button for the character
     const editButton = document.createElement("button");
-    editButton.innerHTML = `<i class="fa fa-pen"></i> <span class="caret"></span>`;
+    editButton.innerHTML = `<i class="fa fa-edit"></i> <span class="caret"></span>`;
     editButton.classList.add("btn", "btn-warning", "btn-sm");
     editButton.style.marginRight = "5px";
     editButton.onclick = (event) => {
@@ -403,4 +276,18 @@ function deleteCharacter(charName) {
   const dropdownContainer = document.getElementById("dropdown-container-chars");
   dropdownContainer.innerHTML = "";
   addButton.style.marginLeft = "45%";
+}
+
+const textBox = document.querySelector(".note-editable.panel-body");
+if (textBox) {
+  textBox.addEventListener("input", function () {
+    localStorage.setItem("userText", textBox.innerHTML);
+  });
+
+  window.addEventListener("load", () => {
+    const savedContent = localStorage.getItem("userText");
+    if (textBox && savedContent) {
+      textBox.innerText = savedContent; // Ou innerHTML, se estiver usando HTML
+    }
+  });
 }
