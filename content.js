@@ -1,14 +1,19 @@
 // Adiciona o botão "Adicionar HTML" ao container
-const buttonContainer = document.querySelector(".col-md-12");
+const buttonContainer = document.querySelector(".col-md-12").children[3];
+const backButton = buttonContainer.querySelector(".btn-info");
+const cancelButton = buttonContainer.querySelector(".btn-danger");
 const submitButton = buttonContainer.querySelector(".btn-success");
+const addButton = document.createElement("button");
 
 if (buttonContainer) {
   buttonContainer.style.marginBottom = "40px";
+  buttonContainer.style.display = "flex";
+  backButton.style.marginRight = "5px";
+  cancelButton.style.marginRight = "5px";
 
-  const addButton = document.createElement("button");
   addButton.innerText = "Adicionar HTML";
   addButton.classList.add("btn", "btn-default", "btn-primary");
-  addButton.style.marginLeft = "5px"; // Espaçamento
+  addButton.style.marginLeft = "45%";
 
   // Impede a ação do botão de sucesso
   addButton.onclick = function (event) {
@@ -22,8 +27,31 @@ if (buttonContainer) {
 
   // Verifica se há personagens e cria o botão "Menu de Chars"
   if (getCharacters().length > 0) {
+    addButton.style.marginLeft = "28%";
     createMenuButton();
   }
+}
+
+// Função para obter personagens do localStorage
+function getCharacters() {
+  return JSON.parse(localStorage.getItem("characters")) || [];
+}
+
+// Função para criar o botão "Menu de Chars"
+function createMenuButton() {
+  const menuButton = document.createElement("button");
+  menuButton.innerText = "Menu de Chars";
+  menuButton.classList.add("btn", "btn-default", "btn-secondary");
+  menuButton.style.marginLeft = "5px";
+
+  // Impede a ação do botão de sucesso
+  menuButton.onclick = function (event) {
+    event.preventDefault(); // Impede o comportamento padrão
+    event.stopPropagation(); // Para evitar que o clique propague para o botão de submit
+    toggleCharacterMenu(); // Ao clicar, abre o popup
+  };
+
+  addButton.insertAdjacentElement("afterend", menuButton);
 }
 
 // Função para abrir o fake popup
@@ -122,23 +150,12 @@ function saveCharacter() {
 
   // Atualiza o menu de chars se necessário
   if (characters.length === 1) {
+    addButton.style.marginLeft = "28%";
     createMenuButton();
   }
 
   // Fecha o popup
   document.getElementById("popupContainer").remove();
-}
-
-// Função para criar o botão "Menu de Chars"
-function createMenuButton() {
-  const menuButton = document.createElement("button");
-  menuButton.innerText = "Menu de Chars";
-  menuButton.classList.add("btn", "btn-default", "btn-info");
-  menuButton.style.marginLeft = "5px"; // Espaçamento
-  menuButton.onclick = toggleCharacterMenu;
-
-  const toolbar = document.querySelector(".note-toolbar.panel-heading");
-  toolbar.appendChild(menuButton);
 }
 
 // Função para alternar o menu de personagens
@@ -191,9 +208,4 @@ function deleteCharacter(charName) {
   characters = characters.filter((c) => c.charName !== charName);
   localStorage.setItem("characters", JSON.stringify(characters));
   alert("Personagem deletado.");
-}
-
-// Função para obter personagens do localStorage
-function getCharacters() {
-  return JSON.parse(localStorage.getItem("characters")) || [];
 }
