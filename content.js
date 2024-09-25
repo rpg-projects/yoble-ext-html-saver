@@ -11,6 +11,7 @@ const cancelButton = buttonContainer.querySelector(".btn-danger");
 const submitButton = buttonContainer.querySelector(".btn-success");
 const addButton = document.createElement("button");
 
+//Adicionar botão de "Adicionar HMTL" e "Menu de chars" na inicialização
 if (buttonContainer) {
   buttonContainer.style.marginBottom = "40px";
   buttonContainer.style.display = "flex";
@@ -21,9 +22,8 @@ if (buttonContainer) {
   addButton.classList.add("btn", "btn-default", "btn-primary");
   addButton.style.marginLeft = "45%";
 
-  // Impede a ação do botão de sucesso
   addButton.onclick = function (event) {
-    event.preventDefault(); // Impede o comportamento padrão
+    event.preventDefault(); // Impede a ação do botão de sucesso
     event.stopPropagation(); // Para evitar que o clique propague para o botão de submit
     openFakePopup(); // Ao clicar, abre o popup
   };
@@ -94,7 +94,9 @@ function openFakePopup(charData = {}) {
   }
 
   // Event Listeners
-  document.getElementById("saveChar").onclick = saveCharacter;
+  document.getElementById("saveChar").onclick = () => {
+    saveCharacter();
+  };
   document.getElementById("closePopup").onclick = () => {
     document.body.removeChild(popupContainer);
   };
@@ -137,10 +139,16 @@ function saveCharacter() {
   localStorage.setItem("characters", JSON.stringify(characters));
   alert("Personagem salvo com sucesso!");
 
-  // Atualiza o menu de chars se necessário
+  // Atualiza o menu de chars
   if (characters.length === 1) {
     addButton.style.marginLeft = "38%";
     createMenuButton();
+  } else if (characters.length > 1) {
+    const dropdownContainer = document.getElementById(
+      "dropdown-container-chars"
+    );
+    const dropdownMenu = dropdownContainer.querySelector(".dropdown-menu");
+    loadCharacterDropdown(dropdownMenu);
   }
 
   // Fecha o popup
@@ -232,6 +240,7 @@ function loadCharacterDropdown(dropdownMenu) {
 
   const characters = getCharacters();
   characters.forEach((char) => {
+    console.log("char :>> ", char.charName);
     const charItem = document.createElement("li");
     charItem.style.marginBottom = "5px";
 
