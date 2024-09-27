@@ -124,8 +124,10 @@ function saveCharacter(charId = "") {
   if (!charName) {
     alert("Nome do personagem é obrigatório!");
     return;
+  } else if (charName.length > 8) {
+    alert("Coloque um nome de no máximo 8 letras");
+    return;
   }
-
   //   if (!charHtml.includes("TEXTO")) {
   //     alert("HTML da narração deve conter 'TEXTO' e começar com '<html>'!");
   //     return;
@@ -186,7 +188,7 @@ function createMenuButton() {
 
   dropdownMenu.classList.add("dropdown-menu");
   dropdownMenu.style.padding = "10px";
-  dropdownMenu.style.width = "200px";
+  dropdownMenu.style.width = "170px";
   dropdownMenu.style.maxHeight = "150px";
   dropdownMenu.style.overflowY = "auto";
 
@@ -196,7 +198,7 @@ function createMenuButton() {
   // dropdownMenu.style.alignItems = "flex-start";
 
   dropdownMenu.style.marginTop = "-100px";
-  dropdownMenu.style.marginLeft = "-250%";
+  dropdownMenu.style.marginLeft = "-115px";
 
   // Add the button and menu to the dropdown container
   dropdownContainer.appendChild(menuButton);
@@ -251,6 +253,7 @@ function populateDropdownMenu(characters, dropdownMenu) {
     const charButton = document.createElement("button");
     charButton.innerText = char.charName;
     charButton.style.display = "block";
+    charButton.style.textAlign = "left";
 
     charButton.style.background = "none"; // Remove o fundo do botão
     charButton.style.border = "none"; // Remove a borda do botão
