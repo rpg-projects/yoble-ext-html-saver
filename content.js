@@ -183,11 +183,19 @@ function createMenuButton() {
 
   // Create the dropdown menu
   const dropdownMenu = document.createElement("ul");
+
   dropdownMenu.classList.add("dropdown-menu");
   dropdownMenu.style.padding = "10px";
   dropdownMenu.style.width = "200px";
+  dropdownMenu.style.maxHeight = "150px";
+  dropdownMenu.style.overflowY = "auto";
 
-  dropdownMenu.style.marginTop = "-180%";
+  //fazer a lista crescer para cima
+  // dropdownMenu.style.display = "flex";
+  // dropdownMenu.style.flexDirection = "column-reverse";
+  // dropdownMenu.style.alignItems = "flex-start";
+
+  dropdownMenu.style.marginTop = "-100px";
   dropdownMenu.style.marginLeft = "-250%";
 
   // Add the button and menu to the dropdown container
@@ -199,15 +207,77 @@ function createMenuButton() {
 
   // Populate the dropdown with saved characters (if needed)
   const characters = getCharacters(); // Assuming getCharacters() is already defined
+  populateDropdownMenu(characters, dropdownMenu);
+}
+
+// Função para carregar personagens no dropdown (caso seja atualizado)
+function loadCharacterDropdown(dropdownMenu) {
+  dropdownMenu.innerHTML = ""; // Limpa a lista antes de adicionar os personagens
+
+  const characters = getCharacters();
+  if (characters.length === 0) {
+    const dropdownContainer = document.getElementById(
+      "dropdown-container-chars"
+    );
+    dropdownContainer.innerHTML = "";
+    addButton.style.marginLeft = "45%";
+  } else {
+    populateDropdownMenu(characters, dropdownMenu);
+  }
+}
+
+function colocarHTML(char) {
+  console.log("nada aqui ainda");
+}
+
+function populateDropdownMenu(characters, dropdownMenu) {
+  if (characters.length == 1) {
+    dropdownMenu.style.marginTop = "-100px";
+  } else if (characters.length == 2) {
+    dropdownMenu.style.marginTop = "-130px";
+  } else if (characters.length == 3) {
+    dropdownMenu.style.marginTop = "-165px";
+  } else if (characters.length >= 4) {
+    dropdownMenu.style.marginTop = "-192px";
+  }
+
   characters.forEach((char) => {
     const charItem = document.createElement("li");
     charItem.style.display = "flex";
+    charItem.style.justifyContent = "space-between";
+    charItem.style.alignItems = "center";
     charItem.style.marginBottom = "5px";
 
-    const charLink = document.createElement("a");
-    charLink.href = "#";
-    charLink.innerText = char.charName;
-    charLink.style.display = "block";
+    const charButton = document.createElement("button");
+    charButton.innerText = char.charName;
+    charButton.style.display = "block";
+
+    charButton.style.background = "none"; // Remove o fundo do botão
+    charButton.style.border = "none"; // Remove a borda do botão
+    charButton.style.color = "inherit"; // Usa a cor do texto normal
+    charButton.style.font = "inherit"; // Usa a fonte do texto normal
+    charButton.style.cursor = "pointer"; // Estiliza o cursor como pointer
+    charButton.style.padding = "0"; // Remove padding extra
+
+    charButton.style.flexGrow = "1"; // Faz o botão ocupar o espaço à esquerda
+
+    let isSelected = false;
+
+    charButton.onclick = (event) => {
+      isSelected = !isSelected;
+
+      if (isSelected) {
+        charButton.style.fontWeight = "bold"; // Estiliza como selecionado
+        charButton.style.color = "blue"; // Muda a cor quando selecionado
+      } else {
+        charButton.style.fontWeight = "normal"; // Volta ao estado normal
+        charButton.style.color = "inherit"; // Restaura a cor original
+      }
+
+      event.preventDefault(); // Impede o comportamento padrão
+      event.stopPropagation();
+      colocarHTML(char); // Chama a função ao clicar, passando o personagem como argumento
+    };
 
     // Edit button for the character
     const editButton = document.createElement("button");
@@ -231,69 +301,17 @@ function createMenuButton() {
       loadCharacterDropdown(dropdownMenu); // Assuming loadCharacterDropdown(dropdownMenu) is defined to refresh the menu
     };
 
-    // Append the link and buttons to the list item
-    charItem.appendChild(charLink);
-    charItem.appendChild(editButton);
-    charItem.appendChild(deleteButton);
+    const buttonContainer = document.createElement("div");
+    buttonContainer.style.display = "flex"; // Coloca os botões lado a lado
+    buttonContainer.appendChild(editButton);
+    buttonContainer.appendChild(deleteButton);
 
-    // Add the list item to the dropdown menu
+    // Append the link and buttons to the list item
+    charItem.appendChild(charButton);
+    charItem.appendChild(buttonContainer);
+
     dropdownMenu.appendChild(charItem);
   });
-}
-
-// Função para carregar personagens no dropdown (caso seja atualizado)
-function loadCharacterDropdown(dropdownMenu) {
-  dropdownMenu.innerHTML = ""; // Limpa a lista antes de adicionar os personagens
-
-  const characters = getCharacters();
-  if (characters.length === 0) {
-    const dropdownContainer = document.getElementById(
-      "dropdown-container-chars"
-    );
-    dropdownContainer.innerHTML = "";
-    addButton.style.marginLeft = "45%";
-  } else {
-    characters.forEach((char) => {
-      console.log("char :>> ", char.charName);
-      const charItem = document.createElement("li");
-      charItem.style.marginBottom = "5px";
-
-      const charLink = document.createElement("a");
-      charLink.href = "#";
-      charLink.innerText = char.charName;
-      charLink.style.display = "block";
-
-      // Botão de editar personagem
-      const editButton = document.createElement("button");
-      editButton.innerHTML = `<i class="fa fa-edit"></i>`;
-      editButton.classList.add("btn", "btn-warning", "btn-sm");
-      editButton.style.marginRight = "5px";
-      editButton.onclick = (event) => {
-        event.preventDefault(); // Impede o comportamento padrão
-        event.stopPropagation(); // Para evitar que o clique propague para o botão de submit
-
-        openFakePopup(char); // Abre o popup de edição
-      };
-
-      // Botão de deletar personagem
-      const deleteButton = document.createElement("button");
-      deleteButton.innerHTML = `<i class="fa fa-trash"></i>`;
-      deleteButton.classList.add("btn", "btn-danger", "btn-sm");
-      deleteButton.onclick = (event) => {
-        event.preventDefault(); // Impede o comportamento padrão
-        event.stopPropagation(); // Para evitar que o clique propague para o botão de submit
-
-        deleteCharacter(char.id); // Deleta o personagem
-        loadCharacterDropdown(dropdownMenu); // Recarrega a lista de personagens
-      };
-
-      // Adiciona o link e os botões no item do menu
-      charItem.appendChild(charLink);
-      charItem.appendChild(editButton);
-      charItem.appendChild(deleteButton);
-      dropdownMenu.appendChild(charItem);
-    });
-  }
 }
 
 // Função para deletar um personagem
@@ -301,9 +319,9 @@ function deleteCharacter(id) {
   let characters = getCharacters();
   characters = characters.filter((char) => char.id !== id);
   localStorage.setItem("characters", JSON.stringify(characters));
-  // alert("Personagem deletado.");
 }
 
+// Salvar texto se fechar a aba
 const textBox = document.querySelector(".note-editable.panel-body");
 if (textBox) {
   textBox.addEventListener("input", function () {
