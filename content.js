@@ -4,7 +4,14 @@
 //   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css";
 // document.head.appendChild(fontAwesome);
 
-// Adiciona o botão "Adicionar HTML" ao container
+function generateUUID() {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0,
+      v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 const buttonContainer = document.querySelector(".col-md-12").children[3];
 const backButton = buttonContainer.querySelector(".btn-info");
 const cancelButton = buttonContainer.querySelector(".btn-danger");
@@ -86,8 +93,10 @@ function openFakePopup(charData = {}) {
   popupContainer.innerHTML = popupHTML;
   document.body.appendChild(popupContainer);
 
+  let id = "";
   // Preenche os campos se for uma edição
   if (charData.charName) {
+    id = charData.id;
     document.getElementById("charName").value = charData.charName;
     document.getElementById("charHtml").value = charData.html;
     document.getElementById("charSpeech").value = charData.fala;
@@ -95,7 +104,7 @@ function openFakePopup(charData = {}) {
 
   // Event Listeners
   document.getElementById("saveChar").onclick = () => {
-    saveCharacter();
+    saveCharacter(id);
   };
   document.getElementById("closePopup").onclick = () => {
     document.body.removeChild(popupContainer);
@@ -103,16 +112,20 @@ function openFakePopup(charData = {}) {
 }
 
 // Função para salvar o personagem
-function saveCharacter() {
+function saveCharacter(charId = "") {
+  const id = charId == "" ? generateUUID() : charId;
   const charName = document.getElementById("charName").value.trim();
   const charHtml = document.getElementById("charHtml").value.trim();
   const charSpeech = document.getElementById("charSpeech").value.trim();
+
+  const charData = { id, charName, html: charHtml, fala: charSpeech };
 
   // Verificações
   if (!charName) {
     alert("Nome do personagem é obrigatório!");
     return;
   }
+
   //   if (!charHtml.includes("TEXTO")) {
   //     alert("HTML da narração deve conter 'TEXTO' e começar com '<html>'!");
   //     return;
@@ -122,13 +135,8 @@ function saveCharacter() {
   //     return;
   //   }
 
-  // Salvar no localStorage
   const characters = getCharacters();
-  const existingCharIndex = characters.findIndex(
-    (c) => c.charName === charName
-  );
-
-  const charData = { charName, html: charHtml, fala: charSpeech };
+  const existingCharIndex = characters.findIndex((char) => char.id === id);
 
   if (existingCharIndex > -1) {
     characters[existingCharIndex] = charData; // Atualiza se já existir
@@ -137,7 +145,6 @@ function saveCharacter() {
   }
 
   localStorage.setItem("characters", JSON.stringify(characters));
-  alert("Personagem salvo com sucesso!");
 
   // Atualiza o menu de chars
   if (characters.length === 1) {
@@ -204,7 +211,7 @@ function createMenuButton() {
 
     // Edit button for the character
     const editButton = document.createElement("button");
-    editButton.innerHTML = `<i class="fa fa-edit"></i> <span class="caret"></span>`;
+    editButton.innerHTML = `<i class="fa fa-edit"></i>`;
     editButton.classList.add("btn", "btn-warning", "btn-sm");
     editButton.style.marginRight = "5px";
     editButton.onclick = (event) => {
@@ -215,12 +222,12 @@ function createMenuButton() {
 
     // Delete button for the character
     const deleteButton = document.createElement("button");
-    deleteButton.innerHTML = `<i class="fa fa-trash"></i> <span class="caret"></span>`;
+    deleteButton.innerHTML = `<i class="fa fa-trash"></i>`;
     deleteButton.classList.add("btn", "btn-danger", "btn-sm");
     deleteButton.onclick = (event) => {
       event.preventDefault(); // Impede o comportamento padrão
       event.stopPropagation(); // Para evitar que o clique propague para o botão de submit
-      deleteCharacter(char.charName); // Assuming deleteCharacter(charName) is defined
+      deleteCharacter(char.id); // Assuming deleteCharacter(charName) is defined
       loadCharacterDropdown(dropdownMenu); // Assuming loadCharacterDropdown(dropdownMenu) is defined to refresh the menu
     };
 
@@ -239,52 +246,62 @@ function loadCharacterDropdown(dropdownMenu) {
   dropdownMenu.innerHTML = ""; // Limpa a lista antes de adicionar os personagens
 
   const characters = getCharacters();
-  characters.forEach((char) => {
-    console.log("char :>> ", char.charName);
-    const charItem = document.createElement("li");
-    charItem.style.marginBottom = "5px";
+  if (characters.length === 0) {
+    const dropdownContainer = document.getElementById(
+      "dropdown-container-chars"
+    );
+    dropdownContainer.innerHTML = "";
+    addButton.style.marginLeft = "45%";
+  } else {
+    characters.forEach((char) => {
+      console.log("char :>> ", char.charName);
+      const charItem = document.createElement("li");
+      charItem.style.marginBottom = "5px";
 
-    const charLink = document.createElement("a");
-    charLink.href = "#";
-    charLink.innerText = char.charName;
-    charLink.style.display = "block";
+      const charLink = document.createElement("a");
+      charLink.href = "#";
+      charLink.innerText = char.charName;
+      charLink.style.display = "block";
 
-    // Botão de editar personagem
-    const editButton = document.createElement("button");
-    editButton.innerText = "Editar";
-    editButton.classList.add("btn", "btn-warning", "btn-sm");
-    editButton.style.marginRight = "5px";
-    editButton.onclick = () => {
-      openFakePopup(char); // Abre o popup de edição
-    };
+      // Botão de editar personagem
+      const editButton = document.createElement("button");
+      editButton.innerHTML = `<i class="fa fa-edit"></i>`;
+      editButton.classList.add("btn", "btn-warning", "btn-sm");
+      editButton.style.marginRight = "5px";
+      editButton.onclick = (event) => {
+        event.preventDefault(); // Impede o comportamento padrão
+        event.stopPropagation(); // Para evitar que o clique propague para o botão de submit
 
-    // Botão de deletar personagem
-    const deleteButton = document.createElement("button");
-    deleteButton.innerText = "Deletar";
-    deleteButton.classList.add("btn", "btn-danger", "btn-sm");
-    deleteButton.onclick = () => {
-      deleteCharacter(char.charName); // Deleta o personagem
-      loadCharacterDropdown(dropdownMenu); // Recarrega a lista de personagens
-    };
+        openFakePopup(char); // Abre o popup de edição
+      };
 
-    // Adiciona o link e os botões no item do menu
-    charItem.appendChild(charLink);
-    charItem.appendChild(editButton);
-    charItem.appendChild(deleteButton);
-    dropdownMenu.appendChild(charItem);
-  });
+      // Botão de deletar personagem
+      const deleteButton = document.createElement("button");
+      deleteButton.innerHTML = `<i class="fa fa-trash"></i>`;
+      deleteButton.classList.add("btn", "btn-danger", "btn-sm");
+      deleteButton.onclick = (event) => {
+        event.preventDefault(); // Impede o comportamento padrão
+        event.stopPropagation(); // Para evitar que o clique propague para o botão de submit
+
+        deleteCharacter(char.id); // Deleta o personagem
+        loadCharacterDropdown(dropdownMenu); // Recarrega a lista de personagens
+      };
+
+      // Adiciona o link e os botões no item do menu
+      charItem.appendChild(charLink);
+      charItem.appendChild(editButton);
+      charItem.appendChild(deleteButton);
+      dropdownMenu.appendChild(charItem);
+    });
+  }
 }
 
 // Função para deletar um personagem
-function deleteCharacter(charName) {
+function deleteCharacter(id) {
   let characters = getCharacters();
-  characters = characters.filter((c) => c.charName !== charName);
+  characters = characters.filter((char) => char.id !== id);
   localStorage.setItem("characters", JSON.stringify(characters));
-  alert("Personagem deletado.");
-
-  const dropdownContainer = document.getElementById("dropdown-container-chars");
-  dropdownContainer.innerHTML = "";
-  addButton.style.marginLeft = "45%";
+  // alert("Personagem deletado.");
 }
 
 const textBox = document.querySelector(".note-editable.panel-body");
