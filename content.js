@@ -25,9 +25,9 @@ if (buttonContainer) {
   backButton.style.marginRight = "5px";
   cancelButton.style.marginRight = "5px";
 
-  addButton.innerText = "Adicionar HTML";
+  addButton.innerText = "Salvar novo HTML";
   addButton.classList.add("btn", "btn-default", "btn-primary");
-  addButton.style.marginLeft = "45%";
+  addButton.style.marginLeft = "43%";
 
   addButton.onclick = function (event) {
     event.preventDefault(); // Impede a ação do botão de sucesso
@@ -40,7 +40,7 @@ if (buttonContainer) {
 
   // Verifica se há personagens e cria o botão "Menu de Chars"
   if (getCharacters().length > 0) {
-    addButton.style.marginLeft = "38%";
+    addButton.style.marginLeft = "37%";
     createMenuButton();
   }
 }
@@ -150,7 +150,7 @@ function saveCharacter(charId = "") {
 
   // Atualiza o menu de chars
   if (characters.length === 1) {
-    addButton.style.marginLeft = "38%";
+    addButton.style.marginLeft = "37%";
     createMenuButton();
   } else if (characters.length > 1) {
     const dropdownContainer = document.getElementById(
@@ -222,7 +222,7 @@ function loadCharacterDropdown(dropdownMenu) {
       "dropdown-container-chars"
     );
     dropdownContainer.innerHTML = "";
-    addButton.style.marginLeft = "45%";
+    addButton.style.marginLeft = "43%";
   } else {
     populateDropdownMenu(characters, dropdownMenu);
   }
