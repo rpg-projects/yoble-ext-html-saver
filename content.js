@@ -229,7 +229,151 @@ function loadCharacterDropdown(dropdownMenu) {
 }
 
 function colocarHTML(char) {
-  console.log("nada aqui ainda");
+  const textElement = document.querySelector(".note-editable.panel-body");
+  const text = textElement.innerHTML;
+  const { html, fala } = char;
+  const [htmlPart1, htmlPart2] = html.split("TEXTO");
+  const [lineStart, lineEnd] = fala.split("FALA");
+
+  let isLineStart = true;
+  let newText = [];
+
+  for (let i = 0; i < text.length; i++) {
+    if ((text[i] == "~" || text[i] == "—") && isLineStart) {
+      newText.push(lineStart);
+      isLineStart = false;
+    } else if ((text[i] == "~" || text[i] == "—") && isLineStart == false) {
+      console.log("fim da fala");
+      newText.push(lineEnd);
+      isLineStart = true;
+    } else newText.push(text[i]);
+  }
+
+  textElement.innerHTML = `${htmlPart1}${newText.join("")}${htmlPart2}`;
+}
+
+// function tirarHTML(char) {
+//   const textElement = document.querySelector(".note-editable.panel-body");
+//   let text = textElement.innerHTML;
+
+//   const { html, fala } = char;
+//   let [htmlPart1, htmlPart2] = html.split("TEXTO");
+
+//   text = text.replace(htmlPart1, "").replace(htmlPart2, "").trim();
+//   console.log("text :>> ", text);
+
+// Substitui os espaços adicionais e ajusta a formatação conforme necessário
+// text = text.replace(/\s+/g, " ").trim(); // Remove espaços extras e ajusta a formatação
+
+// console.log(text); // Exibe o texto no console
+
+//
+// htmlPart1 = htmlPart1.trim();
+// htmlPart2 = htmlPart2.trim();
+// const lastLetterHtml1 = htmlPart1[htmlPart1.length - 1];
+// const firstLetterHtml2 = htmlPart2[0];
+
+// let [lineStart, lineEnd] = fala.split("FALA");
+// lineStart = lineStart.trim();
+// lineEnd = lineEnd.trim();
+
+// console.log("text :>> ", text);
+
+// text = text.split(lastLetterHtml1)[1];
+// text = text.split(firstLetterHtml2)[0];
+
+// console.log("text :>> ", text);
+
+//   textElement.innerHTML = text;
+// }
+
+function buscarParteERemover(parteHtml, texto) {
+  const normalizedTexto = texto.replace(/\s+/g, "").trim();
+  const normalizedTextoComImgBar = texto
+    .replace(/<img([^>]*)>/g, "<img$1/>")
+    .replace(/\s+/g, "")
+    .trim();
+
+  const normalizedParteHtml = parteHtml.replace(/\s+/g, "").trim();
+  const m = normalizedParteHtml.length;
+
+  function busca(texto, n) {
+    // Percorre o texto principal
+    for (let i = 0; i <= n - m; i++) {
+      let j;
+
+      // Compara a substring do texto com o padrão
+      for (j = 0; j < m; j++) {
+        if (texto[i + j] !== normalizedParteHtml[j]) {
+          break; // Se houver um caractere diferente, sai do laço
+        }
+      }
+
+      // Se o laço interno completou sem interrupção, encontramos a substring
+      if (j === m) {
+        // Remove a substring substituindo por um espaço
+        const inicio = i;
+        const fim = i + m - 1;
+        console.log("inicio :>> ", inicio);
+        console.log("fim :>> ", fim);
+        const textoModificado = texto.slice(0, i) + " " + texto.slice(i + m);
+        return textoModificado.trim(); // Remove espaços extras e retorna o texto resultante
+      }
+    }
+    return null;
+  }
+
+  // Tenta encontrar e remover a parte HTML no texto normalizado sem barra
+  const n = normalizedTexto.length;
+  let resultado = busca(normalizedTexto, n);
+  if (resultado) return resultado;
+
+  // Se não encontrou, tenta encontrar e remover no texto com barra
+  const nb = normalizedTextoComImgBar.length;
+  resultado = busca(normalizedTextoComImgBar, nb);
+  if (resultado) return resultado;
+
+  return texto;
+}
+
+// function buscarParteERemover(parteHtml, texto) {
+//   const normalizedTexto = texto.replace(/\s+/g, "").trim();
+//   const normalizedTextoComImgBar = texto
+//     .replace(/<img([^>]*)>/g, "<img$1/>")
+//     .replace(/\s+/g, "")
+//     .trim();
+
+//   const normalizedParteHtml = parteHtml.replace(/\s+/g, "").trim();
+
+//   const existeSubstring = normalizedTexto.includes(normalizedParteHtml);
+//   console.log("existeSubstring :>> ", existeSubstring);
+
+//   const indice = normalizedTexto.indexOf(normalizedParteHtml);
+//   console.log("indice :>> ", indice);
+
+//   return texto; // Retorna o texto original se a parte não for encontrada
+// }
+
+function tirarHTML(char) {
+  const textElement = document.querySelector(".note-editable.panel-body");
+  let text = textElement.innerHTML;
+
+  const { html, fala } = char;
+  let [htmlPart1, htmlPart2] = html.split("TEXTO");
+
+  console.log("text :>> ", text); //está em html no yoble
+  console.log("htmlPart1 :>> ", htmlPart1); //meu html - veio com / na img, mas pode ser sem. (preciso comparar dos dois jeitos)
+
+  // console.log("htmlPart1 :>> ", htmlPart1);
+  // console.log("htmlPart2 :>> ", htmlPart2);
+  // console.log("object :>> ", text);
+
+  text = buscarParteERemover(htmlPart1, text);
+  text = buscarParteERemover(htmlPart2, text);
+
+  console.log("text :>> ", text);
+
+  textElement.innerHTML = text;
 }
 
 function populateDropdownMenu(characters, dropdownMenu) {
@@ -268,18 +412,18 @@ function populateDropdownMenu(characters, dropdownMenu) {
 
     charButton.onclick = (event) => {
       isSelected = !isSelected;
+      event.preventDefault(); // Impede o comportamento padrão
+      event.stopPropagation();
 
       if (isSelected) {
         charButton.style.fontWeight = "bold"; // Estiliza como selecionado
         charButton.style.color = "blue"; // Muda a cor quando selecionado
+        colocarHTML(char); // Chama a função ao clicar, passando o personagem como argumento
       } else {
         charButton.style.fontWeight = "normal"; // Volta ao estado normal
         charButton.style.color = "inherit"; // Restaura a cor original
+        tirarHTML(char);
       }
-
-      event.preventDefault(); // Impede o comportamento padrão
-      event.stopPropagation();
-      colocarHTML(char); // Chama a função ao clicar, passando o personagem como argumento
     };
 
     // Edit button for the character
@@ -334,6 +478,7 @@ if (textBox) {
   window.addEventListener("load", () => {
     const savedContent = localStorage.getItem("userText");
     if (textBox && savedContent) {
+      console.log("savedContent :>> ", savedContent);
       textBox.innerText = savedContent; // Ou innerHTML, se estiver usando HTML
     }
   });
