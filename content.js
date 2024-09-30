@@ -339,14 +339,22 @@ function saveCharacter(charId = "") {
     alert("Coloque um nome de no máximo 8 letras");
     return;
   }
-  //   if (!charHtml.includes("TEXTO")) {
-  //     alert("HTML da narração deve conter 'TEXTO' e começar com '<html>'!");
-  //     return;
-  //   }
-  //   if (!charSpeech.includes("FALA")) {
-  //     alert("HTML da fala deve conter 'FALA'!");
-  //     return;
-  //   }
+  const [part1, part2] = charHtml;
+  if (!charHtml.includes("TEXTO") && (!part1 || !part2)) {
+    alert(
+      "HTML da narração deve conter a palavra 'TEXTO' separada entre espaços!"
+    );
+    return;
+  }
+  const [falaPart1, falaPart2] = charSpeech;
+  if (charSpeech) {
+    if (!charSpeech.includes("FALA") && (!falaPart1 || !falaPart2)) {
+      alert("HTML da fala deve conter 'FALA' separada entre espaços!");
+      return;
+    }
+  } else {
+    charData.fala = " — FALA — ";
+  }
 
   const characters = getCharacters();
   const existingCharIndex = characters.findIndex((char) => char.id === id);
@@ -449,6 +457,9 @@ function colocarHTML(char) {
 
   let isLineStart = true;
   let newText = [];
+
+  console.log("lineStart :>> ", lineStart);
+  console.log("lineEnd :>> ", lineEnd);
 
   for (let i = 0; i < text.length; i++) {
     if ((text[i] == "~" || text[i] == "—") && isLineStart) {
