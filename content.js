@@ -231,7 +231,6 @@ function loadCharacterDropdown(dropdownMenu) {
 function colocarHTML(char) {
   const textElement = document.querySelector(".note-editable.panel-body");
   const text = textElement.innerHTML;
-  const test = cleanTextBoxContent(text);
 
   const { html, fala } = char;
   const [htmlPart1, htmlPart2] = html.split("TEXTO");
@@ -254,40 +253,30 @@ function colocarHTML(char) {
   textElement.innerHTML = `${htmlPart1}${newText.join("")}${htmlPart2}`;
 }
 
-// function tirarHTML(char) {
-//   const textElement = document.querySelector(".note-editable.panel-body");
-//   let text = textElement.innerHTML;
+function normalizeHtmlPreservingTextContent(html) {
+  let insideTag = false;
+  let result = "";
 
-//   const { html, fala } = char;
-//   let [htmlPart1, htmlPart2] = html.split("TEXTO");
+  // Iterate through the string and only remove spaces when inside an HTML tag
+  for (let i = 0; i < html.length; i++) {
+    const char = html[i];
 
-//   text = text.replace(htmlPart1, "").replace(htmlPart2, "").trim();
-//   console.log("text :>> ", text);
+    if (char === "<") {
+      insideTag = true; // We're inside an HTML tag
+    } else if (char === ">") {
+      insideTag = false; // We've exited the tag
+    }
 
-// Substitui os espaços adicionais e ajusta a formatação conforme necessário
-// text = text.replace(/\s+/g, " ").trim(); // Remove espaços extras e ajusta a formatação
+    // Remove spaces if inside a tag, otherwise keep them
+    if (insideTag && /\s/.test(char)) {
+      continue; // Skip whitespace inside tags
+    }
 
-// console.log(text); // Exibe o texto no console
+    result += char;
+  }
 
-//
-// htmlPart1 = htmlPart1.trim();
-// htmlPart2 = htmlPart2.trim();
-// const lastLetterHtml1 = htmlPart1[htmlPart1.length - 1];
-// const firstLetterHtml2 = htmlPart2[0];
-
-// let [lineStart, lineEnd] = fala.split("FALA");
-// lineStart = lineStart.trim();
-// lineEnd = lineEnd.trim();
-
-// console.log("text :>> ", text);
-
-// text = text.split(lastLetterHtml1)[1];
-// text = text.split(firstLetterHtml2)[0];
-
-// console.log("text :>> ", text);
-
-//   textElement.innerHTML = text;
-// }
+  return result.trim();
+}
 
 function buscarParteERemover(parteHtml, texto) {
   const normalizedTexto = normalizeHtmlPreservingTextContent(texto).trim();
@@ -314,10 +303,8 @@ function buscarParteERemover(parteHtml, texto) {
       // Se o laço interno completou sem interrupção, encontramos a substring
       if (j === m) {
         // Remove a substring substituindo por um espaço
-        const inicio = i;
-        const fim = i + m - 1;
-        console.log("inicio :>> ", inicio);
-        console.log("fim :>> ", fim);
+        // const inicio = i;
+        // const fim = i + m - 1;
         const textoModificado = texto.slice(0, i) + " " + texto.slice(i + m);
         return textoModificado.trim(); // Remove espaços extras e retorna o texto resultante
       }
@@ -338,24 +325,6 @@ function buscarParteERemover(parteHtml, texto) {
   return texto;
 }
 
-// function buscarParteERemover(parteHtml, texto) {
-//   const normalizedTexto = texto.replace(/\s+/g, "").trim();
-//   const normalizedTextoComImgBar = texto
-//     .replace(/<img([^>]*)>/g, "<img$1/>")
-//     .replace(/\s+/g, "")
-//     .trim();
-
-//   const normalizedParteHtml = parteHtml.replace(/\s+/g, "").trim();
-
-//   const existeSubstring = normalizedTexto.includes(normalizedParteHtml);
-//   console.log("existeSubstring :>> ", existeSubstring);
-
-//   const indice = normalizedTexto.indexOf(normalizedParteHtml);
-//   console.log("indice :>> ", indice);
-
-//   return texto; // Retorna o texto original se a parte não for encontrada
-// }
-
 function tirarHTML(char) {
   const textElement = document.querySelector(".note-editable.panel-body");
   let text = textElement.innerHTML;
@@ -363,17 +332,8 @@ function tirarHTML(char) {
   const { html, fala } = char;
   let [htmlPart1, htmlPart2] = html.split("TEXTO");
 
-  console.log("text :>> ", text); //está em html no yoble
-  console.log("htmlPart1 :>> ", htmlPart1); //meu html - veio com / na img, mas pode ser sem. (preciso comparar dos dois jeitos)
-
-  // console.log("htmlPart1 :>> ", htmlPart1);
-  // console.log("htmlPart2 :>> ", htmlPart2);
-  // console.log("object :>> ", text);
-
   text = buscarParteERemover(htmlPart1, text);
   text = buscarParteERemover(htmlPart2, text);
-
-  console.log("text :>> ", text);
 
   textElement.innerHTML = text;
 }
@@ -487,7 +447,6 @@ if (textBox) {
 }
 
 function cleanTextBoxContent(text) {
-  console.log("text :>> ", text);
   const part1 =
     '<span class="selectable-text copyable-text" style="white-space-collapse: preserve;">';
   text = buscarParteERemover(part1, text);
@@ -495,29 +454,4 @@ function cleanTextBoxContent(text) {
   text = buscarParteERemover(part2, text);
 
   return text;
-}
-
-function normalizeHtmlPreservingTextContent(html) {
-  let insideTag = false;
-  let result = "";
-
-  // Iterate through the string and only remove spaces when inside an HTML tag
-  for (let i = 0; i < html.length; i++) {
-    const char = html[i];
-
-    if (char === "<") {
-      insideTag = true; // We're inside an HTML tag
-    } else if (char === ">") {
-      insideTag = false; // We've exited the tag
-    }
-
-    // Remove spaces if inside a tag, otherwise keep them
-    if (insideTag && /\s/.test(char)) {
-      continue; // Skip whitespace inside tags
-    }
-
-    result += char;
-  }
-
-  return result.trim();
 }
