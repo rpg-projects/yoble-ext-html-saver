@@ -499,6 +499,9 @@ function buscarParteERemover(parteHtml, texto) {
     normalizeHtmlPreservingTextContent(parteHtml).trim();
   const m = normalizedParteHtml.length;
 
+  console.log("normalizedTexto :>> ", normalizedTexto);
+  console.log("normalizedParteHtml :>> ", normalizedParteHtml);
+
   function busca(texto, n) {
     // Percorre o texto principal
     for (let i = 0; i <= n - m; i++) {
@@ -514,10 +517,10 @@ function buscarParteERemover(parteHtml, texto) {
       // Se o laço interno completou sem interrupção, encontramos a substring
       if (j === m) {
         // Remove a substring substituindo por um espaço
-        // const inicio = i;
-        // const fim = i + m - 1;
+        const inicio = i;
+        const fim = i + m - 1;
         const textoModificado = texto.slice(0, i) + " " + texto.slice(i + m);
-        return textoModificado.trim(); // Remove espaços extras e retorna o texto resultante
+        return { inicio, fim, text: textoModificado.trim() }; // Remove espaços extras e retorna o texto resultante
       }
     }
     return null;
@@ -533,18 +536,36 @@ function buscarParteERemover(parteHtml, texto) {
   resultado = busca(normalizedTextoComImgBar, nb);
   if (resultado) return resultado;
 
-  return texto;
+  return { inicio: -1, fim: -1, texto };
 }
 
 function tirarHTML(char) {
+  console.log("tirar do char ->", char.charName);
   const textElement = document.querySelector(".note-editable.panel-body");
   let text = textElement.innerHTML;
 
   const { html, fala } = char;
   let [htmlPart1, htmlPart2] = html.split("TEXTO");
 
-  text = buscarParteERemover(htmlPart1, text);
-  text = buscarParteERemover(htmlPart2, text);
+  text = buscarParteERemover(htmlPart1, text).text;
+  text = buscarParteERemover(htmlPart2, text).text;
+
+  let [falaPart1, falaPart2] = fala.split("FALA");
+
+  let n = text.length;
+  let result;
+  for (let i = 0; i < n / 2; i++) {
+    result = buscarParteERemover(falaPart1, text);
+    text = result.text;
+    if (result.inicio == -1) {
+      break;
+    }
+    console.log("text :>> ", text);
+
+    // text = buscarParteERemover(falaPart2, text).text;
+  }
+
+  console.log("text :>> ", text);
 
   textElement.innerHTML = text;
 }
@@ -559,6 +580,8 @@ function populateDropdownMenu(characters, dropdownMenu) {
   } else if (characters.length >= 4) {
     dropdownMenu.style.marginTop = "-192px";
   }
+
+  let selectedButton = null;
 
   characters.forEach((char) => {
     const charItem = document.createElement("li");
@@ -581,21 +604,36 @@ function populateDropdownMenu(characters, dropdownMenu) {
 
     charButton.style.flexGrow = "1"; // Faz o botão ocupar o espaço à esquerda
 
-    let isSelected = false;
-
     charButton.onclick = (event) => {
-      isSelected = !isSelected;
       event.preventDefault(); // Impede o comportamento padrão
       event.stopPropagation();
 
-      if (isSelected) {
+      // Check if another button is already selected
+      if (selectedButton == null) {
         charButton.style.fontWeight = "bold"; // Estiliza como selecionado
-        charButton.style.color = "blue"; // Muda a cor quando selecionado
+        charButton.style.color = "black"; // Muda a cor quando selecionado
         colocarHTML(char); // Chama a função ao clicar, passando o personagem como argumento
+
+        selectedButton = charButton; // Track the selected button
+        charButton.character = char; // Track the character to remove html later
+      } else if (selectedButton && selectedButton !== charButton) {
+        // Deselect the currently selected button
+        const oldCharButton = selectedButton;
+        oldCharButton.style.fontWeight = "normal"; // Volta ao estado normal
+        oldCharButton.style.color = "inherit"; // Restaura a cor original
+        tirarHTML(oldCharButton.character); // Assuming tirarHTML exists
+
+        // Select the new one
+        charButton.style.fontWeight = "bold"; // Estiliza como selecionado
+        charButton.style.color = "black"; // Muda a cor quando selecionado
+        selectedButton = charButton;
+        charButton.character = char;
+        colocarHTML(char);
       } else {
         charButton.style.fontWeight = "normal"; // Volta ao estado normal
         charButton.style.color = "inherit"; // Restaura a cor original
         tirarHTML(char);
+        selectedButton = null;
       }
     };
 
