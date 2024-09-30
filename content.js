@@ -715,23 +715,39 @@ function deleteCharacter(id) {
 
 // Salvar texto se fechar a aba
 const textBox = document.querySelector(".note-editable.panel-body");
+
 if (textBox) {
   textBox.addEventListener("input", function () {
-    const content = textBox;
-    console.log("content :>> ", content.innerHTML);
-    localStorage.setItem("userText", content.innerHTML);
+    let content = textBox;
+    localStorage.setItem("userText", removeDivTags(htmlToString(content)));
   });
 
   window.addEventListener("load", () => {
     const savedContent = localStorage.getItem("userText");
-    console.log("savedContent :>> ", savedContent);
     if (textBox && savedContent) {
-      // const text = cleanTextBoxContent(savedContent);
-      // console.log("text :>> ", text);
-      console.log("savedContent :>> ", savedContent.innerHTML);
       textBox.innerText = savedContent; // Ou innerHTML, se estiver usando HTML
     }
   });
+}
+
+function htmlToString(element) {
+  // Check if the input is a string (selector) or an actual HTML element
+  if (typeof element === "string") {
+    // If it's a selector, use querySelector to get the element
+    const el = document.querySelector(element);
+    if (el) {
+      return el.outerHTML; // Return the outer HTML as a string
+    } else {
+      console.error("Element not found for selector:", element);
+      return null; // Return null if the element is not found
+    }
+  } else if (element instanceof HTMLElement) {
+    // If it's an actual HTML element, return its outerHTML
+    return element.outerHTML;
+  } else {
+    console.error("Invalid input: must be a string selector or an HTMLElement");
+    return null; // Return null for invalid input
+  }
 }
 
 // function cleanTextBoxContent(text) {
@@ -743,3 +759,18 @@ if (textBox) {
 
 //   return text;
 // }
+
+function removeDivTags(inputString) {
+  // Regex to match the specific <div> with variable height at the start
+  const startRegex =
+    /^<div class="note-editable panel-body" contenteditable="true" style="height:\s*\d+px;">/;
+  // Regex to match the closing </div> at the end
+  const endRegex = /<\/div>$/;
+
+  // Remove the opening <div> tag
+  let resultString = inputString.replace(startRegex, "");
+  // Remove the closing </div> tag
+  resultString = resultString.replace(endRegex, "");
+
+  return resultString.trim(); // Trim any extra whitespace from the result
+}
