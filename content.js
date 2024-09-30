@@ -455,7 +455,6 @@ function colocarHTML(char) {
       newText.push(lineStart);
       isLineStart = false;
     } else if ((text[i] == "~" || text[i] == "—") && isLineStart == false) {
-      console.log("fim da fala");
       newText.push(lineEnd);
       isLineStart = true;
     } else newText.push(text[i]);
@@ -546,9 +545,6 @@ function buscarParteDaFalaERemover(parteHtml, texto) {
     normalizeHtmlPreservingTextContent(parteHtml).trim();
   const m = normalizedParteHtml.length;
 
-  console.log("normalizedTexto :>> ", normalizedTexto);
-  console.log("normalizedParteHtml :>> ", normalizedParteHtml);
-
   // Percorre o texto principal
   for (let i = 0; i <= n - m; i++) {
     let j;
@@ -567,7 +563,6 @@ function buscarParteDaFalaERemover(parteHtml, texto) {
       const fim = i + m - 1;
       const textoModificado =
         normalizedTexto.slice(0, i) + "~" + normalizedTexto.slice(i + m);
-      console.log("textoModificado :>> ", textoModificado);
       return { inicio, fim, text: textoModificado.trim() }; // Remove espaços extras e retorna o texto resultante
     }
   }
@@ -576,7 +571,6 @@ function buscarParteDaFalaERemover(parteHtml, texto) {
 }
 
 function tirarHTML(char) {
-  console.log("tirar do char ->", char.charName);
   const textElement = document.querySelector(".note-editable.panel-body");
   let text = textElement.innerHTML;
 
@@ -590,7 +584,6 @@ function tirarHTML(char) {
 
   let n = text.length;
   let result;
-  console.log("text :>> ", text);
   for (let i = 0; i < n / 2; i++) {
     result = buscarParteDaFalaERemover(falaPart1, text);
     if (result.inicio == -1) {
@@ -738,14 +731,12 @@ function htmlToString(element) {
     if (el) {
       return el.outerHTML; // Return the outer HTML as a string
     } else {
-      console.error("Element not found for selector:", element);
       return null; // Return null if the element is not found
     }
   } else if (element instanceof HTMLElement) {
     // If it's an actual HTML element, return its outerHTML
     return element.outerHTML;
   } else {
-    console.error("Invalid input: must be a string selector or an HTMLElement");
     return null; // Return null for invalid input
   }
 }
