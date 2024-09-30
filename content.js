@@ -340,7 +340,12 @@ function saveCharacter(charId = "") {
     return;
   }
   const [part1, part2] = charHtml;
-  if (!charHtml.includes("TEXTO") && (!part1 || !part2)) {
+  if (
+    (!charHtml.includes("TEXTO") ||
+      !charHtml.includes("texto") ||
+      !charHtml.includes("Texto")) &&
+    (!part1 || !part2)
+  ) {
     alert(
       "HTML da narração deve conter a palavra 'TEXTO' separada entre espaços!"
     );
@@ -348,7 +353,12 @@ function saveCharacter(charId = "") {
   }
   const [falaPart1, falaPart2] = charSpeech;
   if (charSpeech) {
-    if (!charSpeech.includes("FALA") && (!falaPart1 || !falaPart2)) {
+    if (
+      (!charSpeech.includes("FALA") ||
+        !charSpeech.includes("Fala") ||
+        !charSpeech.includes("fala")) &&
+      (!falaPart1 || !falaPart2)
+    ) {
       alert("HTML da fala deve conter 'FALA' separada entre espaços!");
       return;
     }
