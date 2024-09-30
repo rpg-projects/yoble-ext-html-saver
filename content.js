@@ -499,9 +499,6 @@ function buscarParteERemover(parteHtml, texto) {
     normalizeHtmlPreservingTextContent(parteHtml).trim();
   const m = normalizedParteHtml.length;
 
-  console.log("normalizedTexto :>> ", normalizedTexto);
-  console.log("normalizedParteHtml :>> ", normalizedParteHtml);
-
   function busca(texto, n) {
     // Percorre o texto principal
     for (let i = 0; i <= n - m; i++) {
@@ -539,6 +536,43 @@ function buscarParteERemover(parteHtml, texto) {
   return { inicio: -1, fim: -1, texto };
 }
 
+function buscarParteDaFalaERemover(parteHtml, texto) {
+  const normalizedTexto = normalizeHtmlPreservingTextContent(texto).trim();
+  const n = normalizedTexto.length;
+
+  const normalizedParteHtml =
+    normalizeHtmlPreservingTextContent(parteHtml).trim();
+  const m = normalizedParteHtml.length;
+
+  console.log("normalizedTexto :>> ", normalizedTexto);
+  console.log("normalizedParteHtml :>> ", normalizedParteHtml);
+
+  // Percorre o texto principal
+  for (let i = 0; i <= n - m; i++) {
+    let j;
+
+    // Compara a substring do texto com o padrão
+    for (j = 0; j < m; j++) {
+      if (normalizedTexto[i + j] !== normalizedParteHtml[j]) {
+        break; // Se houver um caractere diferente, sai do laço
+      }
+    }
+
+    // Se o laço interno completou sem interrupção, encontramos a substring
+    if (j === m) {
+      // Remove a substring substituindo por um espaço
+      const inicio = i;
+      const fim = i + m - 1;
+      const textoModificado =
+        normalizedTexto.slice(0, i) + "~" + normalizedTexto.slice(i + m);
+      console.log("textoModificado :>> ", textoModificado);
+      return { inicio, fim, text: textoModificado.trim() }; // Remove espaços extras e retorna o texto resultante
+    }
+  }
+
+  return { inicio: -1, fim: -1, texto };
+}
+
 function tirarHTML(char) {
   console.log("tirar do char ->", char.charName);
   const textElement = document.querySelector(".note-editable.panel-body");
@@ -554,18 +588,16 @@ function tirarHTML(char) {
 
   let n = text.length;
   let result;
+  console.log("text :>> ", text);
   for (let i = 0; i < n / 2; i++) {
-    result = buscarParteERemover(falaPart1, text);
-    text = result.text;
+    result = buscarParteDaFalaERemover(falaPart1, text);
     if (result.inicio == -1) {
       break;
     }
-    console.log("text :>> ", text);
-
-    // text = buscarParteERemover(falaPart2, text).text;
+    text = result.text;
+    result = buscarParteDaFalaERemover(falaPart2, text);
+    text = result.text;
   }
-
-  console.log("text :>> ", text);
 
   textElement.innerHTML = text;
 }
@@ -690,6 +722,7 @@ if (textBox) {
     const savedContent = localStorage.getItem("userText");
     if (textBox && savedContent) {
       const text = cleanTextBoxContent(savedContent);
+      console.log("text :>> ", text);
       textBox.innerText = text; // Ou innerHTML, se estiver usando HTML
     }
   });
@@ -698,9 +731,9 @@ if (textBox) {
 function cleanTextBoxContent(text) {
   const part1 =
     '<span class="selectable-text copyable-text" style="white-space-collapse: preserve;">';
-  text = buscarParteERemover(part1, text);
+  text = buscarParteERemover(part1, text).text;
   const part2 = "</span>";
-  text = buscarParteERemover(part2, text);
+  text = buscarParteERemover(part2, text).text;
 
   return text;
 }
