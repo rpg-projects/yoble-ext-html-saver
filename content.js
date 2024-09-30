@@ -468,8 +468,10 @@ function normalizeHtmlPreservingTextContent(html) {
   let insideTag = false;
   let result = "";
 
+  const n = html.length ?? 0;
+
   // Iterate through the string and only remove spaces when inside an HTML tag
-  for (let i = 0; i < html.length; i++) {
+  for (let i = 0; i < n; i++) {
     const char = html[i];
 
     if (char === "<") {
@@ -715,25 +717,29 @@ function deleteCharacter(id) {
 const textBox = document.querySelector(".note-editable.panel-body");
 if (textBox) {
   textBox.addEventListener("input", function () {
-    localStorage.setItem("userText", textBox.innerHTML);
+    const content = textBox;
+    console.log("content :>> ", content.innerHTML);
+    localStorage.setItem("userText", content.innerHTML);
   });
 
   window.addEventListener("load", () => {
     const savedContent = localStorage.getItem("userText");
+    console.log("savedContent :>> ", savedContent);
     if (textBox && savedContent) {
-      const text = cleanTextBoxContent(savedContent);
-      console.log("text :>> ", text);
-      textBox.innerText = text; // Ou innerHTML, se estiver usando HTML
+      // const text = cleanTextBoxContent(savedContent);
+      // console.log("text :>> ", text);
+      console.log("savedContent :>> ", savedContent.innerHTML);
+      textBox.innerText = savedContent; // Ou innerHTML, se estiver usando HTML
     }
   });
 }
 
-function cleanTextBoxContent(text) {
-  const part1 =
-    '<span class="selectable-text copyable-text" style="white-space-collapse: preserve;">';
-  text = buscarParteERemover(part1, text).text;
-  const part2 = "</span>";
-  text = buscarParteERemover(part2, text).text;
+// function cleanTextBoxContent(text) {
+//   const part1 =
+//     '<span class="selectable-text copyable-text" style="white-space-collapse: preserve;">';
+//   text = buscarParteERemover(part1, text).text;
+//   const part2 = "</span>";
+//   text = buscarParteERemover(part2, text).text;
 
-  return text;
-}
+//   return text;
+// }
