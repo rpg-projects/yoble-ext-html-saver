@@ -66,27 +66,238 @@ function openFakePopup(charData = {}) {
 
   // HTML do popup
   const popupHTML = `
-    <div>
-      <h3>Adicionar Personagem</h3>
-      <form id="charForm">
-        <div>
-          <label for="charName">Nome do personagem:</label>
-          <input type="text" id="charName" placeholder="personagem" required />
-        </div>
-        <div>
-          <label for="charHtml">HTML da narração:</label>
-          <input type="text" id="charHtml" placeholder="<html>TEXTO</html>" required />
-          <button type="button" title="coloque o html e destaque com a palavra 'TEXTO' onde você quer o texto do personagem">?</button>
-        </div>
-        <div>
-          <label for="charSpeech">HTML da fala:</label>
-          <input type="text" id="charSpeech" placeholder="<b>— FALA —</b>" required />
-          <button type="button" title="coloque o html e destaque com a palavra 'FALA' onde você quer o texto do personagem">?</button>
-        </div>
-        <button type="button" id="saveChar">Salvar</button>
-        <button type="button" id="closePopup">Fechar</button>
-      </form>
+<div class="form-container">
+  <h3>Salvar novo html</h3>
+
+  <form id="charForm">
+    <div class="first-question">
+      <label for="charName" class="name-label">Nome do personagem:</label>
+      <div class="input-and-small">
+        <input
+          type="text"
+          class="name-input"
+          id="charName"
+          placeholder="personagem"
+          required
+        />
+        <small class="helper-text"
+          >Por favor, insira um nome com até 10 caracteres.</small
+        >
+      </div>
     </div>
+    <div class="second-question">
+      <div class="question-top">
+        <label for="charHtml">HTML da narração:</label>
+        <button
+          type="button"
+          class="help-button"
+          title="Coloque o HTML e destaque com a palavra 'TEXTO' onde você quer o texto do personagem"
+        >
+          ?
+        </button>
+      </div>
+      <textarea
+        id="charHtml"
+        class="text-html"
+        placeholder="<html>TEXTO</html>"
+        required
+        rows="12"
+      ></textarea>
+    </div>
+
+    <div class="third-question">
+      <div class="question-top">
+        <label for="charSpeech">HTML da fala (opcional):</label>
+        <button
+          type="button"
+          class="help-button"
+          title="Coloque o HTML e destaque com a palavra 'FALA' onde você quer a fala do personagem"
+        >
+          ?
+        </button>
+      </div>
+      <input
+        type="text"
+        id="charSpeech"
+        class="fala-html"
+        placeholder="<b>— FALA —</b>"
+        required
+      />
+    </div>
+
+    <div class="button-group">
+      <button type="button" id="saveChar">Salvar</button>
+      <button type="button" id="closePopup">Fechar</button>
+    </div>
+  </form>
+</div>
+
+<style>
+  .form-container {
+    font-family: inherit;
+    font-size: 13px;
+    width: 600px; /* Dobro do tamanho */
+    height: 700px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+  }
+
+  .first-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-direction: row;
+  }
+
+  .name-label {
+    margin-top: -10px;
+    height: 30px;
+  }
+
+  .name-input {
+    width: 340px;
+  }
+
+  .input-and-small {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .helper-text {
+    margin-left: 10px;
+  }
+
+  .first-question,
+  .second-question,
+  .third-question {
+    margin: 20px 30px 0 30px;
+    margin-bottom: 30px; /* Space below each question */
+  }
+
+  .question-top {
+    display: flex;
+    margin-right: 30px;
+    margin-bottom: 5px;
+  }
+
+  label {
+    display: block; /* Ensure label takes full width */
+    font-weight: bold; /* Make the label bold */
+    margin-bottom: 5px; /* Space between label and input */
+  }
+
+  input[type="text"] {
+    padding: 8px; /* Add padding for better appearance */
+    border: 1px solid #ccc; /* Border for input */
+    border-radius: 4px; /* Rounded corners */
+  }
+
+  input[type="text"]:focus {
+    border-color: #007bff; /* Change border color on focus */
+    outline: none; /* Remove default outline */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add shadow on focus */
+  }
+
+  h3 {
+    text-align: center;
+    color: #333;
+    font-family: Arial, sans-serif;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Align items to start */
+  }
+
+  label {
+    font-weight: bold;
+    margin-right: 10px;
+    flex: 1; /* Take available space */
+  }
+
+  input[type="text"],
+  textarea {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    flex: 2; /* Take remaining space */
+  }
+
+  textarea {
+    resize: vertical;
+    margin-top: 5px; /* Add space above the textarea */
+  }
+
+  input[type="text"]:focus,
+  textarea:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+
+  .text-html {
+    width: 500px;
+    overflow: auto; /* Allow scrolling when content overflows */
+    resize: none; /* Prevent resizing the textarea */
+  }
+
+  .fala-html {
+    width: 500px;
+  }
+
+  .help-button {
+    margin-left: 100px; /* Space between label and button */
+    padding: 4px 8px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .help-button:hover {
+    background-color: #0056b3;
+  }
+
+  .button-group {
+    margin: 10px 80px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .button-group button {
+    flex: 1;
+    padding: 10px;
+    margin: 5px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: none;
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .button-group button#closePopup {
+    background-color: #dc3545;
+  }
+
+  .button-group button:hover {
+    background-color: #218838;
+  }
+
+  .button-group button#closePopup:hover {
+    background-color: #c82333;
+  }
+</style>
   `;
 
   // Adiciona o HTML ao popup
