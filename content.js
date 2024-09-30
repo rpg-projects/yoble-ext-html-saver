@@ -231,6 +231,8 @@ function loadCharacterDropdown(dropdownMenu) {
 function colocarHTML(char) {
   const textElement = document.querySelector(".note-editable.panel-body");
   const text = textElement.innerHTML;
+  const test = cleanTextBoxContent(text);
+
   const { html, fala } = char;
   const [htmlPart1, htmlPart2] = html.split("TEXTO");
   const [lineStart, lineEnd] = fala.split("FALA");
@@ -482,4 +484,16 @@ if (textBox) {
       textBox.innerText = savedContent; // Ou innerHTML, se estiver usando HTML
     }
   });
+}
+
+function cleanTextBoxContent(text) {
+  console.log("text :>> ", text);
+
+  const part1 =
+    '<span class="selectable-text copyable-text" style="white-space-collapse: preserve;">';
+  text = buscarParteERemover(part1, text);
+  const part2 = "</span>";
+  text = buscarParteERemover(part2, text);
+
+  console.log("text :>> ", text);
 }
