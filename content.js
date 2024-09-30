@@ -290,13 +290,13 @@ function colocarHTML(char) {
 // }
 
 function buscarParteERemover(parteHtml, texto) {
-  const normalizedTexto = texto.replace(/\s+/g, "").trim();
-  const normalizedTextoComImgBar = texto
+  const normalizedTexto = normalizeHtmlPreservingTextContent(texto).trim();
+  const normalizedTextoComImgBar = normalizeHtmlPreservingTextContent(texto)
     .replace(/<img([^>]*)>/g, "<img$1/>")
-    .replace(/\s+/g, "")
     .trim();
 
-  const normalizedParteHtml = parteHtml.replace(/\s+/g, "").trim();
+  const normalizedParteHtml =
+    normalizeHtmlPreservingTextContent(parteHtml).trim();
   const m = normalizedParteHtml.length;
 
   function busca(texto, n) {
@@ -480,20 +480,44 @@ if (textBox) {
   window.addEventListener("load", () => {
     const savedContent = localStorage.getItem("userText");
     if (textBox && savedContent) {
-      console.log("savedContent :>> ", savedContent);
-      textBox.innerText = savedContent; // Ou innerHTML, se estiver usando HTML
+      const text = cleanTextBoxContent(savedContent);
+      textBox.innerText = text; // Ou innerHTML, se estiver usando HTML
     }
   });
 }
 
 function cleanTextBoxContent(text) {
   console.log("text :>> ", text);
-
   const part1 =
     '<span class="selectable-text copyable-text" style="white-space-collapse: preserve;">';
   text = buscarParteERemover(part1, text);
   const part2 = "</span>";
   text = buscarParteERemover(part2, text);
 
-  console.log("text :>> ", text);
+  return text;
+}
+
+function normalizeHtmlPreservingTextContent(html) {
+  let insideTag = false;
+  let result = "";
+
+  // Iterate through the string and only remove spaces when inside an HTML tag
+  for (let i = 0; i < html.length; i++) {
+    const char = html[i];
+
+    if (char === "<") {
+      insideTag = true; // We're inside an HTML tag
+    } else if (char === ">") {
+      insideTag = false; // We've exited the tag
+    }
+
+    // Remove spaces if inside a tag, otherwise keep them
+    if (insideTag && /\s/.test(char)) {
+      continue; // Skip whitespace inside tags
+    }
+
+    result += char;
+  }
+
+  return result.trim();
 }
